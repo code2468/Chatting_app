@@ -19,6 +19,7 @@ public class server extends JFrame implements ActionListener{
 	Boolean typing;
 	server()
   {
+	setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 	p1=new JPanel();
 	p1.setLayout(null);
 	p1.setBackground(new Color(7,94,84));
@@ -42,7 +43,7 @@ public class server extends JFrame implements ActionListener{
 	p1.add(l2);//to add in frame(mandatory)
 	
 	JLabel l3=new JLabel("person1");
-	l3.setFont(new Font("SAN_SERIF",Font.PLAIN,19));
+	l3.setFont(new Font("SAN_SERIF",Font.BOLD,19));
     l3.setForeground(Color.WHITE);
     l3.setBounds(110,10,100,20);
     p1.add(l3);
@@ -61,10 +62,11 @@ public class server extends JFrame implements ActionListener{
     		if(!typing)
     		{
     			l4.setText("Active now");
+    			//String type=l4.getText();
     		}
     	}
     });
-    t.setInitialDelay();
+   t.setInitialDelay(1000);
     
     ImageIcon i7=new ImageIcon(getClass().getResource("icons/video.png"));
     Image i8 = i7.getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT);
@@ -92,7 +94,22 @@ public class server extends JFrame implements ActionListener{
     t1.setBounds(5,660,310,30);
     t1.setFont(new Font("SAN_SERIF", Font.PLAIN, 17));
     add(t1);
-    t1.addKeyListener(null);
+    t1.addKeyListener(new KeyAdapter()
+    		{
+    	   public void keyPressed(KeyEvent ae)
+    	   {
+    		   l4.setText("Typing..");
+    		   t.stop();
+    		   typing=true;
+    	   }
+    	   public void keyReleased(KeyEvent ae)
+    	   {
+    		   typing=false;
+    		   if(!t.isRunning()) {
+    			   t.start();
+    		   }
+    	   }
+    		});
     
     b1 = new JButton("Send");
     b1.setBounds(320,660,100,30);
@@ -104,11 +121,12 @@ public class server extends JFrame implements ActionListener{
     
     a1=new JTextArea();
     a1.setBackground(Color.WHITE);
+    a1.setBounds(5,73,440,580);
     a1.setFont(new Font("SAN_SERIF",Font.PLAIN,20));
     a1.setEditable(false);
     a1.setLineWrap(true);
-    a1.setWrapStyleWord(false);
-    a1.setBounds(5,73,440,580);
+    a1.setWrapStyleWord(true);
+   
     add(a1);
     
     
@@ -145,6 +163,8 @@ public class server extends JFrame implements ActionListener{
     	a1.setText(a1.getText()+"\n\t\t"+str);
     	sout.writeUTF(str);//exception
     	t1.setText("");
+    	
+    	
     	}
 		
 		catch(Exception e)
@@ -159,15 +179,15 @@ public class server extends JFrame implements ActionListener{
 	String msg="";
 	try
 	{
-	 skt=new ServerSocket(6900);
+	 skt=new ServerSocket(1600);
 	 s=skt.accept();
 	 sin=new DataInputStream(s.getInputStream());
 	 sout=new DataOutputStream(s.getOutputStream());
+	 while(true) {
 	 msg=sin.readUTF();
 	 a1.setText(a1.getText()+"\n"+msg);
+	 }
 	 
-	 skt.close();
-	 s.close();
 	 
 	 
 	 

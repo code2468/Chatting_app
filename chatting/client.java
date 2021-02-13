@@ -15,10 +15,12 @@ public class client extends JFrame implements ActionListener{
 	static Socket s;
 	static DataInputStream sin;
 	static DataOutputStream sout;
+	Boolean typing;
 	
 	
 	client()
   {
+   setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 	p1=new JPanel();
 	p1.setLayout(null);
 	p1.setBackground(new Color(7,94,84));
@@ -54,6 +56,19 @@ public class client extends JFrame implements ActionListener{
     l4.setBounds(110,35,100,20);
     p1.add(l4);
     
+    Timer t=new Timer(1,new ActionListener()
+    {
+    	public void actionPerformed(ActionEvent ae)
+    	{
+    		if(!typing)
+    		{
+    			l4.setText("Active now");
+    			//String type=l4.getText();
+    		}
+    	}
+    });
+   t.setInitialDelay(1000);
+    
     
     ImageIcon i7=new ImageIcon(getClass().getResource("icons/video.png"));
     Image i8 = i7.getImage().getScaledInstance(30, 30, Image.SCALE_DEFAULT);
@@ -81,7 +96,22 @@ public class client extends JFrame implements ActionListener{
     t1.setBounds(5,660,310,30);
     t1.setFont(new Font("SAN_SERIF", Font.PLAIN, 17));
     add(t1);
-    
+    t1.addKeyListener(new KeyAdapter()
+	{
+   public void keyPressed(KeyEvent ae)
+   {
+	   l4.setText("Typing..");
+	   t.stop();
+	   typing=true;
+   }
+   public void keyReleased(KeyEvent ae)
+   {
+	   typing=false;
+	   if(!t.isRunning()) {
+		   t.start();
+	   }
+   }
+	});
     b1 = new JButton("Send");
     b1.setBounds(320,660,100,30);
     b1.setBackground(new Color(7, 94, 84));
@@ -95,7 +125,7 @@ public class client extends JFrame implements ActionListener{
     a1.setFont(new Font("SAN_SERIF",Font.PLAIN,20));
     a1.setEditable(false);
     a1.setLineWrap(true);
-    a1.setWrapStyleWord(false);
+    a1.setWrapStyleWord(true);
     a1.setBounds(5,73,440,580);
     add(a1);
     
@@ -133,9 +163,7 @@ public class client extends JFrame implements ActionListener{
     	a1.setText(a1.getText()+"\n\t\t\t"+str);
     	sout.writeUTF(str);//exception
     	t1.setText("");
-    	
-    	
-		}
+    	}
 		catch(Exception e)
 		{
 			
@@ -147,14 +175,16 @@ public class client extends JFrame implements ActionListener{
 	
 	try
 	{
-		s=new Socket("127.0.0.1",6900);
+		s=new Socket("127.0.0.1",1600);
 		sin=new DataInputStream(s.getInputStream());
 		sout=new DataOutputStream(s.getOutputStream());
 		
 		String msg="";
+		while(true) {
 		msg=sin.readUTF();
 		a1.setText(a1.getText()+"\n"+msg);
-		s.close();
+		}
+		//s.close();
 		 
 	}
 	catch(Exception e)
